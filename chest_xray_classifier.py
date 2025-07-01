@@ -1,44 +1,66 @@
 # chest_xray_classifier.py
 
+"mounted my google drive with colab to use the datasets which are uploaded in google drive"
 
+
+from google.colab import drive
+drive.mount('/content/drive')
+
+import os
 import pandas as pd
-import numpy as np
-from pathlib import Path
+from tqdm import tqdm
+import shutil
 
-classes = [
-    "Pneumonia", "Edema", "Atelectasis", "No Finding", 
-    "COVID-19", "Lung Opacity", "Fibrosis"
-]
+# Paths
+nih_csv_path = '/content/drive/MyDrive/Datasets/NIH-Chest-X-ray/unzipped/Data_Entry_2017.csv'
+nih_images_path = '/content/drive/MyDrive/Datasets/NIH-Chest-X-ray/unzipped/images'
+covid_images_path = '/content/drive/MyDrive/Datasets/covid/unzipped/COVID-19_Radiography_Dataset/COVID/images'
+target_base = '/content/drive/MyDrive/Datasets/chestxray_8class'
 
-sources = {
-    "Pneumonia": Path("/content/drive/MyDrive/Datasets/Pneumonia"),
-    "Edema": Path("/content/drive/MyDrive/Datasets/Edema"),
-    "Atelectasis": Path("/content/drive/MyDrive/Datasets/Atelectasis"),
-    "No Finding": Path("/content/drive/MyDrive/Datasets/No_Finding"),
-    "COVID-19": Path("/content/drive/MyDrive/Datasets/COVID"),
-    "Lung Opacity": Path("/content/drive/MyDrive/Datasets/Lung_Opacity"),
-    "Fibrosis": Path("/content/drive/MyDrive/Datasets/Fibrosis")
-}
+# Load NIH labels
+df = pd.read_csv(nih_csv_path)
 
-output_dir = Path("/content/drive/MyDrive/Datasets/combined_dataset")
-output_dir.mkdir(exist_ok=True)
+classes = ['COVID', 'No Finding', 'Pneumonia', 'Cardiomegaly',
+           'Effusion', 'Infiltration', 'Atelectasis', 'Mass']
 
-data = []
-
+# Create output folders
 for cls in classes:
-    class_output_dir = output_dir / cls
-    class_output_dir.mkdir(exist_ok=True)
-    
-    all_files = list(sources[cls].glob("*.jpg")) + list(sources[cls].glob("*.png")) + list(sources[cls].glob("*.jpeg"))
-    selected_files = np.random.choice(all_files, size=1500, replace=False)
-    
-    for file_path in selected_files:
-        new_path = class_output_dir / file_path.name
-        new_path.write_bytes(file_path.read_bytes())
-        data.append({
-            "image_path": str(new_path),
-            "label": cls
-        })
+    os.makedirs(os.path.join(target_base, cls.replace(' ', '_')), exist_ok=True)
 
-df = pd.DataFrame(data)
-df.to_csv("/content/drive/MyDrive/Datasets/dataset.csv", index=False)
+nih_classes = classes[1:]  # skip 'COVID' for now
+
+def collect_images_for_class(label, max_images=3000):
+    label_folder = os.path.join(target_base, label.replace(' ', '_'))
+    count = 0
+    for i, row in tqdm(df.iterrows(), total=len(df)):
+        labels = row['Finding Labels'].split('|')
+        if label in labels:
+            filename = row['Image Index']
+            src = os.path.join(nih_images_path, filename)
+            dst = os.path.join(label_folder, filename)
+            if os.path.exists(src):
+                shutil.copy(src, dst)
+                count += 1
+        if count >= max_images:
+            break
+
+for label in nih_classes:
+    collect_images_for_class(label)
+
+def collect_covid_images(max_images=3000):
+    dst_dir = os.path.join(target_base, 'COVID')
+    os.makedirs(dst_dir, exist_ok=True)
+
+    count = 0
+    for fname in tqdm(os.listdir(covid_images_path), desc="Copying COVID"):
+        if fname.lower().endswith(('.png', '.jpg', '.jpeg')):
+            src = os.path.join(covid_images_path, fname)
+            dst = os.path.join(dst_dir, fname)
+            if not os.path.exists(dst):
+                shutil.copy(src, dst)
+                count += 1
+        if count >= max_images:
+            break
+
+collect_covid_images()
+
