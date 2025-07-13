@@ -93,3 +93,41 @@ def collect_covid_images(max_images=1000):
 collect_covid_images(max_images=1500)
 
 print("\nDataset prepared with 8 class folders")
+import tensorflow as tf
+from tensorflow.keras import layers
+
+data_dir = '/content/drive/MyDrive/Datasets/chestxray_8class_fast'
+img_size = (224, 224)
+batch_size = 32
+seed = 42
+
+train_ds = tf.keras.utils.image_dataset_from_directory(
+    data_dir,
+    validation_split=0.2,
+    subset='training',
+    seed=seed,
+    image_size=img_size,
+    batch_size=batch_size
+)
+
+val_ds = tf.keras.utils.image_dataset_from_directory(
+    data_dir,
+    validation_split=0.2,
+    subset='validation',
+    seed=seed,
+    image_size=img_size,
+    batch_size=batch_size
+)
+
+AUTOTUNE = tf.data.AUTOTUNE
+train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
+val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
+
+data_augmentation = tf.keras.Sequential([
+    layers.Rescaling(1./255),  # Normalize pixel values (0-1)
+    layers.RandomFlip("horizontal"),
+    layers.RandomRotation(0.05),
+    layers.RandomZoom(0.1),
+    layers.RandomTranslation(0.1, 0.1),
+    layers.RandomContrast(0.2),
+])
