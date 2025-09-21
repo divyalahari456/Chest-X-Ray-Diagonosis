@@ -1,12 +1,12 @@
 # Chest X-Ray Diagonosis
-Team Details <hr>
-<b>Team Number:</b><br>
-25AACR12<br><br>
-Senior Mentor:<br>
-S.Rahul<br><br>
-Junior Mentor:<br>
-C.Srakshin<br><br>
-Team Member 1:
+## Team Details
+<b>Team Number:</b>  
+25AACR12    
+<b>Senior Mentor:</b>  
+S.Rahul    
+<b>Junior Mentor:</b>  
+C.Srakshin    
+Team Member 1:  
 
 Team Member 2:
 
