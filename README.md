@@ -26,4 +26,4 @@ Team Member 5:
 -[Preview]
 -[Contribution]
 ## Introduction
-This project 
+This project focuses on building a model that diagnoses chest diseases from chest X-ray images.To develop a deep learning–based model capable of classifying chest X-ray images into multiple disease categories (such as COVID-19, Pneumonia, and Emphysema) to assist in automated and accurate diagnosis.
