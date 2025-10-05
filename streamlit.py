@@ -1,5 +1,4 @@
 import io
-import json
 import numpy as np
 import pandas as pd
 from PIL import Image
@@ -9,24 +8,17 @@ from tensorflow import keras
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras import backend as K
 
+# --- Page config ---
 st.set_page_config(page_title="Chest X-ray Classifier", page_icon="🫁", layout="centered")
 
 ACCENT = "#EAB308"  
-TOP_K = 5           
+TOP_K = 4          
 
 st.markdown(
     """
     <style>
-    /* Remove the gray background of file uploader */
-    .stFileUploader {
-        background-color: transparent !important;
-    }
-    /* Remove the border around drag & drop area */
-    div[data-baseweb="file-uploader"] {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
+    .stFileUploader { background-color: transparent !important; }
+    div[data-baseweb="file-uploader"] { background-color: transparent !important; border: none !important; box-shadow: none !important; }
     </style>
     """,
     unsafe_allow_html=True
@@ -37,17 +29,18 @@ st.caption("Educational demo only — not for medical diagnosis.")
 
 with st.expander("What does this app do?", expanded=False):
     st.write(
-        "Upload a chest X-ray. The app loads a trained model, "
+        "Upload a chest X-ray. The app loads your trained DenseNet model, "
         "preprocesses the image, predicts the disease class, "
         "and shows confidence scores."
     )
 
-MODEL_PATH = r"Model_Path"
-CLASS_LABELS = ['Covid-19', 'Emphysema', 'Normal', 'Pneumonia-Bacterial']  
+# --- Update these paths/classes ---
+MODEL_PATH = "best_densenet_4class.h5"  # Place the .h5 model file in the same repo/folder
+CLASS_LABELS = ['Pneumonia-Bacterial', 'Covid-19', 'Normal', 'Tuberculosis']  
 IMG_SIZE = (224, 224)
 ACCEPT = ["jpg", "jpeg", "png"]
 
-#focal loss
+# Optional: focal loss (if your model used it)
 def focal_loss(gamma=2., alpha=.25):
     def loss(y_true, y_pred):
         y_pred = K.clip(y_pred, K.epsilon(), 1 - K.epsilon())
@@ -66,6 +59,7 @@ except Exception as e:
     st.error(f"❌ Could not load model.h5. Error: {e}")
     st.stop()
 
+# --- Preprocessing ---
 def preprocess(pil_img: Image.Image):
     img = pil_img.convert("RGB").resize(IMG_SIZE)
     arr = image.img_to_array(img)
@@ -79,6 +73,7 @@ def predict_classes(pil_img: Image.Image):
     idx = int(np.argmax(probs))
     return idx, probs
 
+# --- Streamlit UI ---
 st.markdown('<div class="card">', unsafe_allow_html=True)
 
 uploaded_file = st.file_uploader("📤 Upload a chest X-ray (JPG/PNG)", type=ACCEPT)
@@ -115,3 +110,5 @@ with st.expander("See all class probabilities", expanded=False):
 
 st.caption("This tool is not a medical device and is provided for educational purposes only.")
 st.markdown('</div>', unsafe_allow_html=True)
+
+
