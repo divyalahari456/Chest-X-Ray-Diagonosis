@@ -123,137 +123,186 @@
 #     layers.RandomTranslation(0.1, 0.1),
 #     layers.RandomContrast(0.2),
 # ])
-import numpy as np
-import pandas as pd
 import os
 import shutil
+from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications import DenseNet121
-from tensorflow.keras import layers, models, optimizers
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-
-#training and validation paths
-train_di = "train_path"
-val_dir   = "validation_path"
-
-#given - classes
-target_classes = ['Covid-19', 'Emphysema', 'Normal', 'Pneumonia-Bacterial']
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 
 
-#create training data generator with augmentation
+# CONFIGURATION
+base_dir = "./data"                      # path to your original dataset (with train/val/test)
+output_dir = "./dataset_70_15_15"        # path to store new split dataset
+class_to_remove = "Viral Pneumonia"      # set None if not removing anything
+
+input_size = (224, 224, 3)
+batch_size = 32
+num_classes = 4
+epochs_head = 5
+epochs_finetune = 20
+lr_head = 1e-3
+lr_ft = 1e-5
+dropout_rate = 0.3
+random_state = 42
+
+
+# DATASET SPLITTING (70 / 15 / 15)
+train_dir = os.path.join(base_dir, "train")
+val_dir = os.path.join(base_dir, "val")
+test_dir = os.path.join(base_dir, "test")
+
+new_train_dir = os.path.join(output_dir, "train")
+new_val_dir = os.path.join(output_dir, "val")
+new_test_dir = os.path.join(output_dir, "test")
+
+os.makedirs(new_train_dir, exist_ok=True)
+os.makedirs(new_val_dir, exist_ok=True)
+shutil.copytree(test_dir, new_test_dir, dirs_exist_ok=True)  # keep test unchanged
+
+classes = os.listdir(train_dir)
+for cls in classes:
+    print(f"Processing {cls}...")
+    cls_train = [os.path.join(train_dir, cls, f) for f in os.listdir(os.path.join(train_dir, cls))]
+    cls_val = [os.path.join(val_dir, cls, f) for f in os.listdir(os.path.join(val_dir, cls))]
+    all_images = cls_train + cls_val
+
+    # 70% train, 15% val (from combined 85%)
+    train_imgs, val_imgs = train_test_split(all_images, test_size=0.176, random_state=random_state, shuffle=True)
+
+    os.makedirs(os.path.join(new_train_dir, cls), exist_ok=True)
+    os.makedirs(os.path.join(new_val_dir, cls), exist_ok=True)
+
+    for img in train_imgs:
+        shutil.copy(img, os.path.join(new_train_dir, cls, os.path.basename(img)))
+    for img in val_imgs:
+        shutil.copy(img, os.path.join(new_val_dir, cls, os.path.basename(img)))
+
+print("✅ Done! New dataset is in:", output_dir)
+
+
+# REMOVING A CLASS (OPTIONAL)
+if class_to_remove:
+    splits = ["train", "val", "test"]
+    for split in splits:
+        class_path = os.path.join(output_dir, split, class_to_remove)
+        if os.path.exists(class_path):
+            shutil.rmtree(class_path)
+            print(f"✅ Deleted: {class_path}")
+        else:
+            print(f"⚠️ Not found: {class_path}")
+
+
+
+# DATASET SUMMARY
+splits = ["train", "val", "test"]
+for split in splits:
+    split_path = os.path.join(output_dir, split)
+    print(f"\n🔹 {split.upper()} split:")
+    total_images = 0
+    for cls in sorted(os.listdir(split_path)):
+        cls_path = os.path.join(split_path, cls)
+        if os.path.isdir(cls_path):
+            count = len([f for f in os.listdir(cls_path) if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+            print(f"   {cls}: {count}")
+            total_images += count
+    print(f"   ➡ Total {split} images: {total_images}")
+
+
+
+# MODEL TRAINING
+data_dir = output_dir
+train_dir = os.path.join(data_dir, "train")
+val_dir = os.path.join(data_dir, "val")
+test_dir = os.path.join(data_dir, "test")
+
 train_datagen = ImageDataGenerator(
-    rescale=1.0/255.0,
-    validation_split=0.2,
-    rotation_range=15,
-    width_shift_range=0.1,
-    height_shift_range=0.1,
-    zoom_range=0.1,
-    horizontal_flip=True
+    rescale=1./255,
+    horizontal_flip=True,
+    rotation_range=10,
+    brightness_range=[0.9, 1.1],
+    zoom_range=0.1
 )
 
-#create validation data generator without augmentation
-val_datagen = ImageDataGenerator(
-    rescale=1.0/255.0,
-    validation_split=0.2
-)
+val_datagen = ImageDataGenerator(rescale=1./255)
+test_datagen = ImageDataGenerator(rescale=1./255)
 
-#define training generator
 train_generator = train_datagen.flow_from_directory(
-    directory=train_di,
-    target_size=(224,224),
-    batch_size=32,
-    class_mode="categorical",
-    classes=target_classes,
-    subset="training",
-    shuffle=True,
-    seed=42
+    train_dir,
+    target_size=input_size[:2],
+    batch_size=batch_size,
+    class_mode='categorical',
+    shuffle=True
 )
 
-#define validation generator
 val_generator = val_datagen.flow_from_directory(
-    directory=val_dir,
-    target_size=(224, 224),
-    batch_size=32,
-    class_mode="categorical",
-    classes=target_classes,
-    subset="validation",
-    shuffle=False,
-    seed=42
+    val_dir,
+    target_size=input_size[:2],
+    batch_size=batch_size,
+    class_mode='categorical',
+    shuffle=False
 )
 
-print("Classes:", train_generator.class_indices)
-
-#model building with pretrained model-densenet-121
-base_model = DenseNet121(
-    weights="imagenet",
-    include_top=False,
-    input_shape=(224, 224, 3)
+test_generator = test_datagen.flow_from_directory(
+    test_dir,
+    target_size=input_size[:2],
+    batch_size=batch_size,
+    class_mode='categorical',
+    shuffle=False
 )
 
-base_model.trainable = False
-
-x = base_model.output
-x = layers.GlobalAveragePooling2D()(x)
-x = layers.Dense(256, activation="relu")(x)
-x = layers.Dropout(0.3)(x)
-output_layer = layers.Dense(len(target_classes), activation="softmax")(x)
-
-
-model = models.Model(inputs=base_model.input, outputs=output_layer)
-
-#compile model with initial learning rate
-initial_optimizer = optimizers.Adam(learning_rate=1e-3)
-model.compile(
-    optimizer=initial_optimizer,
-    loss="categorical_crossentropy",
-    metrics=["accuracy"]
-)
-
-#model-checkpoint
+# Callbacks
 callbacks = [
-    EarlyStopping(
-        monitor="val_loss",
-        patience=5,
-        restore_best_weights=True
-    ),
-    ModelCheckpoint(
-        filepath="best_densenet.h5",
-        save_best_only=True
-    )
+    EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True, verbose=1),
+    ModelCheckpoint("best_densenet_4class.h5", monitor='val_accuracy', save_best_only=True, verbose=1),
+    ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=1e-6, verbose=1)
 ]
 
+# Build model
+base_model = DenseNet121(weights='imagenet', include_top=False, input_shape=input_size)
+x = base_model.output
+x = GlobalAveragePooling2D()(x)
+x = Dropout(dropout_rate)(x)
+predictions = Dense(num_classes, activation='softmax')(x)
+model = Model(inputs=base_model.input, outputs=predictions)
 
-#training the model
-history1 = model.fit(
-    train_generator,
-    validation_data=val_generator,
-    epochs=10,
-    callbacks=callbacks,
-    verbose=1
-)
-base_model.trainable = True
-for layer in base_model.layers[:-100]:
+# Phase 1: Train classifier head only
+for layer in base_model.layers:
     layer.trainable = False
 
-#fine-tuning
-fine_tune_optimizer = optimizers.Adam(learning_rate=1e-5)
-model.compile(
-    optimizer=fine_tune_optimizer,
-    loss="categorical_crossentropy",
-    metrics=["accuracy"]
-)
+model.compile(optimizer=Adam(lr_head),
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
 
-history2 = model.fit(
+print("\n--- Training Head ---\n")
+model.fit(
     train_generator,
     validation_data=val_generator,
-    epochs=20,
-    callbacks=callbacks,
-    verbose=1
+    epochs=epochs_head,
+    callbacks=callbacks
 )
 
-loss, acc = model.evaluate(
-    val_generator,
-    verbose=1
+# Phase 2: Fine-tune entire model
+for layer in base_model.layers:
+    layer.trainable = True
+
+model.compile(optimizer=Adam(lr_ft),
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
+print("\n--- Fine-tuning Whole Model ---\n")
+model.fit(
+    train_generator,
+    validation_data=val_generator,
+    epochs=epochs_finetune,
+    callbacks=callbacks
 )
-print(f"\nFinal DenseNet121 Accuracy is ({len(target_classes)} classes): {acc*100:.2f}%")
+
+# Evaluate
+test_loss, test_acc = model.evaluate(test_generator)
+print(f"\n✅ Test Accuracy: {test_acc:.4f}")
+print("✅ Best model saved as 'best_densenet_4class.h5'")
