@@ -55,7 +55,7 @@ Run the Classifier Script:
 python chest_xray_classifier.py
 ```
 ## Preview
-<p>Below is an example of Chest X-Ray Diagnosis:</p>
+
 <div style="display: flex; align-items: center;">
   <img src="CXRD2.png">
   <img src ="X-ray.png">
