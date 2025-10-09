@@ -36,7 +36,15 @@ This project focuses on building a model that diagnoses chest diseases from ches
 <pre>
   Package            Version
 ------------------ -----------
-  
+  tensorflow          2.12.0
+  keras               2.12.0
+  scikit-learn        1.3.0
+  numpy               1.23.0
+  pandas              1.5.0
+  pillow              9.5.0
+  streamlit           1.30.0
+  matplotlib          3.7.0
+  h5py                3.8.0
 </pre>
 ## How to Use
 Follow these steps to run the project:  
