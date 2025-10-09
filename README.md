@@ -18,8 +18,7 @@ Meghana Alluri
 <b>Team Member 3:</b>  
 Divya Lahari Kappagantula
   
-<b>Team Member 4:</b>  
- Sankarshan
+
  
 ## Table of Contents
 - [Introduction](#introduction) <br>
