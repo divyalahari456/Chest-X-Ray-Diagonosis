@@ -42,3 +42,9 @@ This project focuses on building a model that diagnoses chest diseases from ches
 Follow these steps to run the project:  
 Clone:
 <pre></pre>
+## Preview
+<p>Below is an example of Chest X-Ray Diagnosis:</p>
+<div style="display: flex; align-items: center;">
+  <img src="">
+  <img src ="">
+</div>
