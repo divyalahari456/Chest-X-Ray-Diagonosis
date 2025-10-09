@@ -1,1 +1,1 @@
-
+This folder stores image assets used in the Chest X-ray Disease Classifier project, such as sample X-ray images and visual outputs.
