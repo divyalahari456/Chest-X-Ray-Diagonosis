@@ -22,7 +22,7 @@ Divya Lahari Kappagantula
  Sankarshan
   
 <b>Team Member 5:</b>  
-
+Sai Teja
   
 ## Table of Contents
 - [Introduction](#introduction) <br>
@@ -41,7 +41,17 @@ This project focuses on building a model that diagnoses chest diseases from ches
 ## How to Use
 Follow these steps to run the project:  
 Clone:
-<pre></pre>
+```terminal
+git clone https://github.com/AAC-Open-Source-Pool/25AACR12
+```
+Install the required Libraries:
+```terminal
+pip install -r requirements.txt
+```
+Run the Classifier Script:
+```terminal
+python chest_xray_classifier.py
+```
 ## Preview
 <p>Below is an example of Chest X-Ray Diagnosis:</p>
 <div style="display: flex; align-items: center;">
@@ -49,3 +59,4 @@ Clone:
   <img src ="X-ray.png">
   <img src ="Res.png">
 </div>
+## Contribution
