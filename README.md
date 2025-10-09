@@ -39,6 +39,6 @@ This project focuses on building a model that diagnoses chest diseases from ches
   
 </pre>
 ## How to Use
-Follow these steps to run the project:
+Follow these steps to run the project:  
 Clone:
 <pre></pre>
