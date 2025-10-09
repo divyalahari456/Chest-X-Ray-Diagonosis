@@ -59,4 +59,4 @@ python chest_xray_classifier.py
   <img src ="X-ray.png">
   <img src ="Res.png">
 </div>
-## Contribution
+<h2>Contribution</h2>
