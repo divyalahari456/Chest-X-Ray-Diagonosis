@@ -45,6 +45,7 @@ Clone:
 ## Preview
 <p>Below is an example of Chest X-Ray Diagnosis:</p>
 <div style="display: flex; align-items: center;">
-  <img src="">
-  <img src ="">
+  <img src="CXRD1.png">
+  <img src ="X-ray.png">
+  <img src ="Res.png">
 </div>
