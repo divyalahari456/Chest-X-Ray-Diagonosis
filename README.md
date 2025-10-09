@@ -59,4 +59,10 @@ python chest_xray_classifier.py
   <img src ="X-ray.png">
   <img src ="Res.png">
 </div>
-<h2>Contribution</h2>
+## Contribution
+1. Understand the project: Read the README to align your changes with the project’s philosophy and goals.
+
+2. Use the same technology: Ensure your changes use the same programming language, version, and libraries as the original project.
+
+3. Document your changes: Include the issues you found, proposed changes, reasons for them, and sample test cases.
+4. Submit a Pull Request: Follow standard Git etiquette for submitting your contributions.
