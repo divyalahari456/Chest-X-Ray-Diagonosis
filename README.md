@@ -28,18 +28,7 @@ Divya Lahari Kappagantula
 - [Contribution](#contribution) <br>
 ## Introduction
 This project focuses on building a model that diagnoses chest diseases from chest X-ray images.To develop a deep learning–based model capable of classifying chest X-ray images into multiple disease categories (such as COVID-19, Pneumonia, and Tuberculosis) to assist in automated and accurate diagnosis.The project implements convolutional neural network (CNN) with the help of a pre-trained model DenseNet121 to analyze chest X-Rays.
-## Requirements
-<pre>
-  Package            Version
------------------- -----------
-  tensorflow          2.12.0
-  keras               2.12.0
-  scikit-learn        1.3.0
-  numpy               1.23.0
-  pandas              1.5.0
-  streamlit           1.30.0
-  matplotlib          3.7.0
-</pre>
+## Requirements 
 <table>
   <tr>
     <th>Package</th>
@@ -62,16 +51,16 @@ This project focuses on building a model that diagnoses chest diseases from ches
     <td>1.23.0</td>
   </tr>
   <tr>
-    <td>keras     </td>
-    <td>2.12.0</td>
+    <td>streamlit      </td>
+    <td>1.30.0</td>
   </tr>
   <tr>
-    <td>keras     </td>
-    <td>2.12.0</td>
+    <td>matplotlib        </td>
+    <td>3.7.0</td>
   </tr>
   <tr>
-    <td>keras     </td>
-    <td>2.12.0</td>
+    <td>pandas   </td>
+    <td>1.5.0</td>
   </tr>
 </table>
 ## How to Use
