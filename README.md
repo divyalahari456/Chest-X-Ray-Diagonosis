@@ -40,6 +40,40 @@ This project focuses on building a model that diagnoses chest diseases from ches
   streamlit           1.30.0
   matplotlib          3.7.0
 </pre>
+<table>
+  <tr>
+    <th>Package</th>
+    <th>Version</th>
+  </tr>
+  <tr>
+    <td>tensorflow</td>
+    <td>2.12.0</td>
+  </tr>
+  <tr>
+    <td>keras     </td>
+    <td>2.12.0</td>
+  </tr>
+  <tr>
+    <td>scikit-learn</td>
+    <td>1.3.0</td>
+  </tr>
+  <tr>
+    <td>numpy         </td>
+    <td>1.23.0</td>
+  </tr>
+  <tr>
+    <td>keras     </td>
+    <td>2.12.0</td>
+  </tr>
+  <tr>
+    <td>keras     </td>
+    <td>2.12.0</td>
+  </tr>
+  <tr>
+    <td>keras     </td>
+    <td>2.12.0</td>
+  </tr>
+</table>
 ## How to Use
 Follow these steps to run the project:  
 Clone:
