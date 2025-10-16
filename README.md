@@ -63,6 +63,7 @@ This project focuses on building a model that diagnoses chest diseases from ches
     <td>1.5.0</td>
   </tr>
 </table>
+
 ## How to Use
 Follow these steps to run the project:  
 Clone:
