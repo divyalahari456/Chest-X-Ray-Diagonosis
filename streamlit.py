@@ -27,11 +27,25 @@ st.markdown("<h1><span>🩺Chest X-ray Disease Classifier</span></h1>", unsafe_a
 st.caption("Educational demo only — not for medical diagnosis.")
 
 with st.expander("What does this app do?", expanded=False):
-    st.write(
-        "Upload a chest X-ray. The app loads your trained DenseNet model, "
-        "preprocesses the image, predicts the disease class, "
-        "and shows confidence scores."
-    )
+    st.markdown("""
+    This web application uses a **DenseNet-121 deep learning model** to analyze chest X-rays and predict possible lung diseases.  
+    It automatically preprocesses the uploaded image, performs classification, and displays confidence scores.
+
+    **Model can detect four classes:**
+    - Pneumonia (Bacterial)  
+    - COVID-19  
+    - Normal (Healthy)  
+    - Tuberculosis  
+
+    **Key Features:**
+    - Displays predicted disease and confidence level  
+    - Provides a brief description, symptoms, and precautions  
+    - Highlights urgent cases requiring medical attention  
+    - Visualizes class-wise prediction confidence  
+    """)
+
+
+
 
 # --- Model setup ---
 MODEL_PATH = "best_densenet_4class.h5"
@@ -39,7 +53,7 @@ CLASS_LABELS = ['Pneumonia-Bacterial', 'Covid-19', 'Normal', 'Tuberculosis']
 IMG_SIZE = (224, 224)
 ACCEPT = ["jpg", "jpeg", "png"]
 
-# Optional: focal loss (if your model used it)
+# Optional: focal loss
 def focal_loss(gamma=2., alpha=.25):
     def loss(y_true, y_pred):
         y_pred = K.clip(y_pred, K.epsilon(), 1 - K.epsilon())
@@ -73,7 +87,58 @@ def predict_classes(pil_img: Image.Image):
     idx = int(np.argmax(probs))
     return idx, probs
 
-# --- Dynamic Precautions based on class + confidence ---
+# --- Disease Descriptions & Symptoms ---
+DISEASE_INFO = {
+    "Pneumonia-Bacterial": {
+        "description": (
+            "Bacterial pneumonia is an infection that inflames the air sacs in one or both lungs. "
+            "It is often caused by *Streptococcus pneumoniae* and can fill the lungs with pus or fluid."
+        ),
+        "symptoms": [
+            "High fever and chills",
+            "Cough with phlegm or pus",
+            "Chest pain when breathing or coughing",
+            "Shortness of breath and fatigue"
+        ]
+    },
+    "Covid-19": {
+        "description": (
+            "COVID-19 is a respiratory illness caused by the SARS-CoV-2 virus. "
+            "It primarily affects the lungs and can range from mild symptoms to severe pneumonia."
+        ),
+        "symptoms": [
+            "Fever or chills",
+            "Dry cough and sore throat",
+            "Loss of taste or smell",
+            "Difficulty breathing in severe cases"
+        ]
+    },
+    "Normal": {
+        "description": (
+            "The X-ray shows no signs of lung infection or abnormality. "
+            "The lungs appear healthy and clear."
+        ),
+        "symptoms": [
+            "No abnormal respiratory symptoms observed"
+        ]
+    },
+    "Tuberculosis": {
+        "description": (
+            "Tuberculosis (TB) is a contagious infection caused by *Mycobacterium tuberculosis* bacteria. "
+            "It mainly affects the lungs and spreads through the air when an infected person coughs."
+        ),
+        "symptoms": [
+            "Persistent cough lasting more than 3 weeks",
+            "Coughing up blood or mucus",
+            "Chest pain and night sweats",
+            "Weight loss and fatigue"
+        ]
+    }
+}
+
+
+
+# --- Precautions logic remains same ---
 def get_precautions(predicted_class: str, confidence: float):
     base_precautions = {
         "Pneumonia-Bacterial": [
@@ -116,14 +181,13 @@ def get_precautions(predicted_class: str, confidence: float):
         ]
     }
 
-    # Determine precautions based on confidence
     if confidence > 0.9:
         items = base_precautions.get(predicted_class, []) + strong_precautions.get(predicted_class, [])
     elif confidence > 0.7:
         items = base_precautions.get(predicted_class, [])
-        items.append("consulting a doctor is recommended.")
+        items.append("Consulting a doctor is recommended.")
     else:
-        items = ["retesting or consultation is recommended."]
+        items = ["Retesting or consultation is recommended."]
 
     if not items:
         items = ["No specific precautions available."]
@@ -155,6 +219,7 @@ with c1:
 with c2:
     st.metric(label="Confidence", value=f"{confidence*100:.2f}%")
 
+
 # --- Urgency Alert ---
 if pred_label != "Normal" and confidence > 0.9:
     st.error("🚨 **URGENT:** High confidence in abnormal X-ray. Please seek immediate medical attention.")
@@ -162,6 +227,16 @@ elif pred_label != "Normal" and confidence > 0.7:
     st.warning("⚠️ **Notice:** Possible abnormality detected. Please consult a doctor for confirmation.")
 else:
     st.info("✅ No urgent signs detected.")
+
+
+# --- 🧬 Disease Description & Symptoms Section (NEW) ---
+if pred_label in DISEASE_INFO:
+    info = DISEASE_INFO[pred_label]
+    st.markdown("### 🧬 Disease Information")
+    st.info(f"**Description:** {info['description']}")
+    st.markdown("**Common Symptoms:**")
+    for sym in info["symptoms"]:
+        st.markdown(f"- {sym}")
 
 # --- Precautions Section ---
 st.markdown("### 🩹 Precautions & Health Advice")
@@ -187,8 +262,3 @@ with st.expander("See all class probabilities", expanded=False):
 
 st.caption("This tool is not a medical device and is provided for educational purposes only.")
 st.markdown('</div>', unsafe_allow_html=True)
-
-
-
-
-
