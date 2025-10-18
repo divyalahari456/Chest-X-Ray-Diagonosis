@@ -65,9 +65,10 @@ python chest_xray_classifier.py
 ## Preview
 
 <div style="display: flex; align-items: center;">
-  <img src="CXRD3.png">
-  <img src ="XRAY.png">
-  <img src ="Res.png">
+  <img src="1.png">
+  <img src ="4.png">
+  <img src ="2.png">
+  <img src ="3.png">
 </div>
 
 ## Team Details
