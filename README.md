@@ -7,7 +7,7 @@
 - [Preview](#preview) <br>
 - [Contribution](#contribution) <br>
 
-## Introduction
+## Abstract
 This project focuses on building a model that diagnoses chest diseases from chest X-ray images.To develop a deep learning–based model capable of classifying chest X-ray images into multiple disease categories (such as COVID-19, Pneumonia, and Tuberculosis) to assist in automated and accurate diagnosis.The project implements convolutional neural network (CNN) with the help of a pre-trained model DenseNet121 to analyze chest X-Rays.
 
 
