@@ -1,11 +1,12 @@
 # Chest X-Ray Diagonosis
 
 ## Table of Contents
-- [Introduction](#introduction) <br>
+- [Introduction](#abstract) <br>
 - [Reqirements](#requirements) <br>
 - [How to Use](#how-to-use) <br>
 - [Preview](#preview) <br>
 - [Contribution](#contribution) <br>
+- [Improvements](#improvements) <br>
 
 ## Abstract
 This project focuses on building a model that diagnoses chest diseases from chest X-ray images.To develop a deep learning–based model capable of classifying chest X-ray images into multiple disease categories (such as COVID-19, Pneumonia, and Tuberculosis) to assist in automated and accurate diagnosis.The project implements convolutional neural network (CNN) with the help of a pre-trained model DenseNet121 to analyze chest X-Rays.
@@ -97,3 +98,21 @@ Divya Lahari Kappagantula
 3. Write a documentation on the changes that you are proposing. The documentation should include the problems you have noticed in the code(if any), the changes you would like to propose, the reason for these changes, and sample test cases. Remember that the topics in the documentation are strictly not limited to the topics aforementioned, but are just an inclusion.
 4. Submit a pull request via [Git etiquettes](https://gist.github.com/mikepea/863f63d6e37281e329f8)
 
+## Improvements
+While the current model performs effectively, several improvements can further enhance its accuracy, interpretability, and usability:
+
+1. **Model Enhancement:**  
+   Implement and compare advanced architectures like **ResNet50**, **EfficientNet**, or **Vision Transformers (ViT)** to achieve higher diagnostic precision.  
+
+2. **Explainability and Visualization:**  
+   Integrate **Grad-CAM** or **LIME** visualizations to highlight critical regions in the X-ray image influencing the model’s predictions.  
+
+3. **Dataset Expansion:**  
+   Incorporate larger and more diverse datasets to reduce class imbalance and improve generalization across different imaging conditions.  
+
+4. **Performance Optimization:**  
+   Utilize **model quantization**, **mixed precision training**, or **GPU acceleration** to reduce inference time and memory consumption.  
+
+5. **User Interface and Accessibility:**  
+   Enhance the Streamlit interface with interactive reports, confidence scores, and patient data integration.  
+   Enable **cloud deployment** (e.g., Streamlit Cloud, AWS, or GCP) for broader accessibility.  
