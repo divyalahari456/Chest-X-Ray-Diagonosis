@@ -1,5 +1,7 @@
 # Chest X-Ray Diagonosis
 
+<img src="logo.jpg" alt="Logo" width="200" style="border-radius: 50%;">
+
 ## Table of Contents
 - [Introduction](#abstract) <br>
 - [Reqirements](#requirements) <br>
