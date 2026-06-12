@@ -1,11 +1,13 @@
+import os
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
 import io
 import numpy as np
 import pandas as pd
 from PIL import Image
 import streamlit as st
-from tensorflow import keras
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras import backend as K
+import tf_keras as keras
+from tf_keras.preprocessing import image
+from tf_keras import backend as K
 
 # --- Streamlit page config ---
 st.set_page_config(page_title="Chest X-ray Classifier", page_icon="🫁", layout="centered")
